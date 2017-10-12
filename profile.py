@@ -1,34 +1,38 @@
 from spy_details import spy
 from steganography.steganography import Steganography
 from datetime import datetime
-
+from termcolor import colored
 import time
 import csv
 
 
-print 'welcome to spychat'
-response=raw_input("Do you want to continue as " + spy['salutation'] + " " + spy['name'] + " (Y/N)? ")
+print colored('welcome to spychat','red')
+print colored("Do you want to continue as " + spy['salutation'] + " " + spy['name'] + " (Y/N)? ",'blue')
+response=raw_input()
+
+
 STATUS_MESSAGES = ['This is thakur, good', 'quick learner, be quick.']
 friends= []
-print "welcome "+spy['salutation'] + " " + spy['name'] +"have a nice time"
+
 
 
 def load_friends():
     with open('friends.csv', 'rb') as friends_data:
-        reader = csv.read(friends_data)
+        reader = csv.reader(friends_data)
 
         for row in reader:
-            spy = spy(row[0], row[1], row[2], row[3])
+            spy={"name":row[0],"salutation":row[1],"age":row[2],"rating":row[3],"chats":[]}
+
             friends.append(spy)
 
 
 
 def start_chat(spy):
-
+    load_friends()
     current_status_message = None
     show_menu=True
     while show_menu:
-        menu_choices = "What do you want to do? \n1. Add a status update \n2. add friend \n 3.select friend \n 4.send message \n 5.read message \n 6.exit"
+        menu_choices =colored("\nWhat do you want to do? \n 1. Add a status update \n 2. add friend \n 3.select friend \n 4.send message \n 5.read message \n 6.exit",'blue')
         menu_choice = raw_input(menu_choices)
 
         if menu_choice == '1':
@@ -43,15 +47,16 @@ def start_chat(spy):
             read_message()
         else:
            show_menu = False
-           print 'thank you for using spy chat'
+           print colored('thank you for using spy chat','cyan')
 
 
 
 def add_status(current_status_message):
+    updated_status_message=current_status_message
     if current_status_message != None:
-           print "Your current status message is " + current_status_message + "\n"
+           print colored("Your current status message is " + current_status_message + "\n",'green')
     else:
-           print 'You don\'t have any status message currently \n'
+           print colored('You don\'t have any status message currently \n','red')
     default = raw_input("Do you want to select from the older status (y/n)?")
 
     if default.upper() == "N":
@@ -63,7 +68,7 @@ def add_status(current_status_message):
     elif default.upper() == 'Y':
             item_position = 1
             for message in STATUS_MESSAGES:
-                print str(item_position) + ". " + message
+                print colored(str(item_position) + ". " + message,'blue')
                 item_position = item_position + 1
             message_selection = input("\nChoose from the above messages ")
             if len(STATUS_MESSAGES) >= message_selection:
@@ -76,7 +81,8 @@ def add_friend():
     'name': '',
     'salutation': '',
     'age': 0,
-    'rating': 0.0
+    'rating': 0.0,
+    'chats':[]
   }
 
   new_friend['name'] = raw_input("Please add your friend's name: ")
@@ -88,16 +94,16 @@ def add_friend():
   if len(new_friend['name']) > 0 and new_friend['age'] > 12 and new_friend['rating'] >= spy['rating']:
       friends.append(new_friend)
       print 'spy added'
-      '''with open('friends.csv', 'wb') as friends_data:
+      with open('friends.csv', 'wb') as friends_data:
           writer = csv.writer(friends_data)
-          writer.writerow([spy.name, spy.saluation, spy.rating, spy.age])'''
+          writer.writerow([new_friend['name'],new_friend['salutation'],new_friend['rating'],new_friend['age']])
   else:
       print 'Sorry! Invalid entry. We can\'t add spy with the details you provided'
   return len(friends)
 def select_friend ():
   item_number = 0
   for friend in friends:
-    print '%d. %s' % (item_number + 1, friend['name'])
+    print colored('%d. %s' % (item_number + 1, friend['name']),'magenta')
     item_number = item_number + 1
   friend_choice = int(raw_input("Choose from your friends"))
   friend_choice_position = friend_choice - 1
@@ -109,16 +115,18 @@ def send_message():
   original_image = raw_input("What is the name of the image?")
   output_path = 'output.jpg'
   text = raw_input("What do you want to say?")
+  print 'loading......'
   Steganography.encode(original_image, output_path, text)
-  '''new_chat = {
+  print 'Image generated'
+  new_chat = {
       "message": text,
       "time": datetime.now(),
 
       "sent_by_me": True
-  }'''
+  }
 
-  #friends[friend_choice]['chats'].append(new_chat)
-print "Your secret message is ready!"
+  friends[friend_choice]['chats'].append(new_chat)
+  print colored("Your secret message is ready!",'green')
 def read_message():
    friend_choice = select_friend()
    output_path = raw_input("What is the name of the file?")
@@ -129,10 +137,17 @@ def read_message():
         "sent_by_me": False
               }
 
-   friends[send_message()]['chats'].append(new_chat)
-   print "Your secret message has been saved!"
-if response=="y":
-    start_chat(spy)
+   friends[friend_choice]['chats'].append(new_chat)
+   print colored("Your secret message has been saved!",'green')
+
+
+if response.upper() == "Y":
+    password = raw_input("Enter password")
+    if password == "1234":
+        print colored("WELCOME %s. %s HAVE A NICE DAY ",'green')%(spy['salutation'],spy['name'] )
+        start_chat(spy)
+    else:
+        print colored("WRONG PASSWORD",'red')
 else:
     spy_name=raw_input('what is your name  ')
     if len(spy_name)==0:
@@ -147,7 +162,7 @@ else:
         print"enter valid age"
         exit('try again')
     else:
-        print "hello %s  ,%s ,age:%d" %(spy_sallutation,spy_name,spy_age)
+        print colored("hello %s  ,%s ,age:%d",'green')%(spy_sallutation,spy_name,spy_age)
         print "glad to have you"
 
     spy_rating=raw_input('do you want to rate us yes or no:')
@@ -162,7 +177,7 @@ else:
             print"thank you we will try to improve"
 
     else :
-        print"hope you would enjoy time"
+        print colored("hope you would enjoy time",'green')
     start_chat(spy)
 
 
