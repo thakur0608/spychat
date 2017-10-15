@@ -1,4 +1,4 @@
-from spy_details import spy
+from spy_details import spy,friends,Spy
 from steganography.steganography import Steganography
 from datetime import datetime
 from termcolor import colored
@@ -7,12 +7,11 @@ import csv
 
 
 print colored('welcome to spychat','red')
-print colored("Do you want to continue as " + spy['salutation'] + " " + spy['name'] + " (Y/N)? ",'blue')
+print colored("Do you want to continue as " + spy.salutation + " " + spy.name + " (Y/N)? ",'blue')
 response=raw_input()
 
 
 STATUS_MESSAGES = ['This is thakur, good', 'quick learner, be quick.']
-friends= []
 
 
 
@@ -27,7 +26,7 @@ def load_friends():
 
 
 
-def start_chat(spy):
+def start_chat():
     load_friends()
     current_status_message = None
     show_menu=True
@@ -86,12 +85,12 @@ def add_friend():
   }
 
   new_friend['name'] = raw_input("Please add your friend's name: ")
-  new_friend['salutation'] = raw_input("Are they Mr. or Ms.?: ")
+  new_friend['salutation']= raw_input("Are they Mr. or Ms.?: ")
   new_friend['name'] = new_friend['salutation'] + " " + new_friend['name']
 
   new_friend['age'] = int(raw_input("Age?"))
   new_friend['rating'] = float(raw_input("Spy rating?"))
-  if len(new_friend['name']) > 0 and new_friend['age'] > 12 and new_friend['rating'] >= spy['rating']:
+  if len(new_friend['name']) > 0 and new_friend['age'] > 12 and new_friend['rating'] >= spy.rating:
       friends.append(new_friend)
       print 'spy added'
       with open('friends.csv', 'wb') as friends_data:
@@ -101,19 +100,19 @@ def add_friend():
       print 'Sorry! Invalid entry. We can\'t add spy with the details you provided'
   return len(friends)
 def select_friend ():
-  item_number = 0
-  for friend in friends:
-    print colored('%d. %s' % (item_number + 1, friend['name']),'magenta')
-    item_number = item_number + 1
-  friend_choice = int(raw_input("Choose from your friends"))
-  friend_choice_position = friend_choice - 1
+    item_number = 1
+    for temp in friends:
 
-  return friend_choice_position
+        print colored(('%d %s') % (item_number, temp['name']), 'magenta')
+        item_number = item_number + 1
+    friend_choice = int(raw_input("Choose from your friends"))
+    friend_choice_position = friend_choice - 1
+    return friend_choice_position
 def send_message():
   friend_choice = select_friend()
 
   original_image = raw_input("What is the name of the image?")
-  output_path = 'output.jpg'
+  output_path = 'result.jpg'
   text = raw_input("What do you want to say?")
   print 'loading......'
   Steganography.encode(original_image, output_path, text)
@@ -138,14 +137,14 @@ def read_message():
               }
 
    friends[friend_choice]['chats'].append(new_chat)
-   print colored("Your secret message has been saved!",'green')
+   print secret_text
 
 
 if response.upper() == "Y":
     password = raw_input("Enter password")
     if password == "1234":
-        print colored("WELCOME %s. %s HAVE A NICE DAY ",'green')%(spy['salutation'],spy['name'] )
-        start_chat(spy)
+        print colored("WELCOME %s. %s HAVE A NICE DAY ",'green')%(spy.salutation,spy.name )
+        start_chat()
     else:
         print colored("WRONG PASSWORD",'red')
 else:
@@ -178,7 +177,7 @@ else:
 
     else :
         print colored("hope you would enjoy time",'green')
-    start_chat(spy)
+    start_chat()
 
 
 
