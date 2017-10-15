@@ -31,7 +31,7 @@ def start_chat():
     current_status_message = None
     show_menu=True
     while show_menu:
-        menu_choices =colored("\nWhat do you want to do? \n 1. Add a status update \n 2. add friend \n 3.select friend \n 4.send message \n 5.read message \n 6.exit",'blue')
+        menu_choices =colored("\nWhat do you want to do? \n 1. Add a status update \n 2. add friend \n 3.select friend \n 4.send message \n 5.read message \n 6.read chat  history 7.exit",'blue')
         menu_choice = raw_input(menu_choices)
 
         if menu_choice == '1':
@@ -44,6 +44,8 @@ def start_chat():
             send_message()
         elif menu_choice == '5':
             read_message()
+        elif menu_choice=='6':
+            read_chat_history()
         else:
            show_menu = False
            print colored('thank you for using spy chat','cyan')
@@ -110,7 +112,7 @@ def select_friend ():
     return friend_choice_position
 def send_message():
   friend_choice = select_friend()
-
+  print friend_choice
   original_image = raw_input("What is the name of the image?")
   output_path = 'result.jpg'
   text = raw_input("What do you want to say?")
@@ -128,8 +130,10 @@ def send_message():
   print colored("Your secret message is ready!",'green')
 def read_message():
    friend_choice = select_friend()
+
    output_path = raw_input("What is the name of the file?")
    secret_text = Steganography.decode(output_path)
+
    new_chat = {
         "message": secret_text,
         "time": datetime.now(),
@@ -137,9 +141,31 @@ def read_message():
               }
 
    friends[friend_choice]['chats'].append(new_chat)
-   print secret_text
+   if (len(secret_text)>100):
 
+     friends.remove(friends[friend_choice])
+     print "friend deleted" \
+           ""
+   else:
+     print secret_text
 
+def read_chat_history():
+
+    read_for = select_friend()
+
+    print '\n'
+    for chat in friends[read_for].chats:
+        if chat.sent_by_me:
+            print(colored(str(chat.time.strftime("%d %B %Y %A %H:%M")) + ",", 'blue')),
+            print(colored("You said:", 'red')),
+
+            print str(chat.message)
+        else:
+            print(colored(str(chat.time.strftime("%d %B %Y %A %H:%M")) + ",", 'blue')),
+
+            print(colored(str(friends[read_for].name) + " said:", 'red')),
+
+            print str(chat.message)
 if response.upper() == "Y":
     password = raw_input("Enter password")
     if password == "1234":
